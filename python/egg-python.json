@@ -1,0 +1,72 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-04-29T18:03:00+00:00",
+    "name": "Python (YuraCloud Pro)",
+    "author": "dapaupau@sigaul.com",
+    "description": "Pro-tier Python egg by YuraCloud. Optimized for performance, auto-dependencies, and full customization.",
+    "features": null,
+    "docker_images": {
+        "ghcr.io/yuracloud/python:latest": "ghcr.io/yuracloud/python:latest"
+    },
+    "file_denylist": [],
+    "startup": "if [ ! -z \"${PRE_STARTUP_COMMAND}\" ]; then eval ${PRE_STARTUP_COMMAND}; fi; if [ -d .git ] && [ \"${AUTO_UPDATE}\" = \"1\" ]; then git pull; fi; if [ -f requirements.txt ]; then pip install -q -r requirements.txt; fi; exec python ${PY_FILE}",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"STARTING|Running|ready|Server started\"\r\n}",
+        "logs": "{}",
+        "stop": "^^C"
+    },
+    "scripts": {
+        "installation": {
+            "container": "python:3.11-slim",
+            "entrypoint": "bash",
+            "script": "#!/bin/bash\napt-get update\napt-get install -y git curl ca-certificates\n\ncd /mnt/server\n\nif [ ! -z \"${GITHUB_PACKAGE}\" ]; then\n    if [ -z \"${GITHUB_PERSONAL_TOKEN}\" ]; then\n        git clone ${GITHUB_PACKAGE} .\n    else\n        git clone https://${GITHUB_USER}:${GITHUB_PERSONAL_TOKEN}@github.com/${GITHUB_PACKAGE} .\n    fi\nfi\n\nif [ ! -f main.py ]; then\ncat << 'EOF' > main.py\nprint(\"Hello from YuraCloud Python!\")\nimport time\nwhile True:\n    print(\"Server is running...\")\n    time.sleep(60)\nEOF\nfi\n\n# --- Auto-detect Region ---\nDETECTED_REGION=$(curl -s http://ip-api.com/line?fields=country | head -n 1)\nif [ -z \"$DETECTED_REGION\" ]; then DETECTED_REGION=\"Unknown\"; fi\n\n# --- Branding and Information ---\necho \"\"\necho \"==================================================\"\necho \"                  YuraCloud                       \"\necho \"==================================================\"\necho \"Informasi Server:\"\necho \"UUID      : ${P_SERVER_UUID}\"\necho \"Region    : ${DETECTED_REGION}\"\necho \"Port      : ${SERVER_PORT}\"\necho \"Egg Type  : Python\"\necho \"==================================================\"\necho \"    Terima kasih sudah membeli di YuraCloud!      \"\necho \"==================================================\"\necho \"\""
+        }
+    },
+    "variables": [
+        {
+            "name": "Python Script File",
+            "description": "The main Python file to execute.",
+            "env_variable": "PY_FILE",
+            "default_value": "main.py",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "GitHub Repository",
+            "description": "Optional: GitHub repository to clone (e.g., username/repo).",
+            "env_variable": "GITHUB_PACKAGE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Pre-Startup Command",
+            "description": "Custom commands to run BEFORE the main script (e.g., pip install psutil).",
+            "env_variable": "PRE_STARTUP_COMMAND",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Update",
+            "description": "Pull latest changes from git on startup if .git exists.",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        }
+    ]
+}
