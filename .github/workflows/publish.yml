@@ -15,15 +15,63 @@ jobs:
     strategy:
       matrix:
         include:
-          - language: python
-            dockerfile: docker/python/Dockerfile
-            image: ghcr.io/daffaajh/egg-python
           - language: nodejs
-            dockerfile: docker/nodejs/Dockerfile
-            image: ghcr.io/daffaajh/egg-nodejs
+            version: "18"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "19"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "20"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "21"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "22"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "23"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "24"
+            base_arg: NODE_VERSION
+          - language: nodejs
+            version: "25"
+            base_arg: NODE_VERSION
+          - language: python
+            version: "3.8"
+            base_arg: PYTHON_VERSION
+          - language: python
+            version: "3.9"
+            base_arg: PYTHON_VERSION
+          - language: python
+            version: "3.10"
+            base_arg: PYTHON_VERSION
+          - language: python
+            version: "3.11"
+            base_arg: PYTHON_VERSION
+          - language: python
+            version: "3.12"
+            base_arg: PYTHON_VERSION
           - language: golang
-            dockerfile: docker/golang/Dockerfile
-            image: ghcr.io/daffaajh/egg-golang
+            version: "1.18"
+            base_arg: GOLANG_VERSION
+          - language: golang
+            version: "1.19"
+            base_arg: GOLANG_VERSION
+          - language: golang
+            version: "1.20"
+            base_arg: GOLANG_VERSION
+          - language: golang
+            version: "1.21"
+            base_arg: GOLANG_VERSION
+          - language: golang
+            version: "1.22"
+            base_arg: GOLANG_VERSION
+          - language: golang
+            version: "1.23"
+            base_arg: GOLANG_VERSION
 
     permissions:
       contents: read
@@ -44,16 +92,17 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ matrix.image }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.language }}
           tags: |
-            type=raw,value=latest
-            type=sha
+            type=raw,value=${{ matrix.version }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.language }}
-          file: ${{ matrix.dockerfile }}
+          file: docker/${{ matrix.language }}/Dockerfile
           push: true
+          build-args: |
+            ${{ matrix.base_arg }}=${{ matrix.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

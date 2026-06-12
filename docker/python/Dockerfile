@@ -1,4 +1,5 @@
-FROM python:3.11-slim
+ARG PYTHON_VERSION=3.11
+FROM python:${PYTHON_VERSION}-slim
 
 LABEL author="YuraCloud" maintainer="dapaupau@sigaul.com"
 

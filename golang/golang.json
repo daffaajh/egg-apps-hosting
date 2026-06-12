@@ -10,7 +10,12 @@
     "description": "Pro-tier Golang egg by YuraCloud. Optimized for performance, auto-updates, security scanning, and full customization.",
     "features": null,
     "docker_images": {
-        "ghcr.io/yuracloud/golang:latest": "ghcr.io/yuracloud/golang:latest"
+        "Golang 1.23": "ghcr.io/daffaajh/golang:1.23",
+        "Golang 1.22": "ghcr.io/daffaajh/golang:1.22",
+        "Golang 1.21": "ghcr.io/daffaajh/golang:1.21",
+        "Golang 1.20": "ghcr.io/daffaajh/golang:1.20",
+        "Golang 1.19": "ghcr.io/daffaajh/golang:1.19",
+        "Golang 1.18": "ghcr.io/daffaajh/golang:1.18"
     },
     "file_denylist": [],
     "startup": "if [ -d .git ] && [ \"${AUTO_UPDATE}\" == \"1\" ]; then git pull; fi; if [ -f go.mod ]; then go mod tidy; fi; exec ${CMD_RUN}",

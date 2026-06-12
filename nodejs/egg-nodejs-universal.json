@@ -10,14 +10,14 @@
     "description": "Pro-tier Node.js egg by YuraCloud. Optimized for performance, auto-updates, and full customization.",
     "features": null,
     "docker_images": {
-        "Node.js 25": "ghcr.io/yuracloud/nodejs:25",
-        "Node.js 24": "ghcr.io/yuracloud/nodejs:24",
-        "Node.js 23": "ghcr.io/yuracloud/nodejs:23",
-        "Node.js 22": "ghcr.io/yuracloud/nodejs:22",
-        "Node.js 21": "ghcr.io/yuracloud/nodejs:21",
-        "Node.js 20": "ghcr.io/yuracloud/nodejs:20",
-        "Node.js 19": "ghcr.io/yuracloud/nodejs:19",
-        "Node.js 18": "ghcr.io/yuracloud/nodejs:18"
+        "Node.js 25": "ghcr.io/daffaajh/nodejs:25",
+        "Node.js 24": "ghcr.io/daffaajh/nodejs:24",
+        "Node.js 23": "ghcr.io/daffaajh/nodejs:23",
+        "Node.js 22": "ghcr.io/daffaajh/nodejs:22",
+        "Node.js 21": "ghcr.io/daffaajh/nodejs:21",
+        "Node.js 20": "ghcr.io/daffaajh/nodejs:20",
+        "Node.js 19": "ghcr.io/daffaajh/nodejs:19",
+        "Node.js 18": "ghcr.io/daffaajh/nodejs:18"
     },
     "file_denylist": [],
     "startup": "if [ -d .git ] && [ \"${AUTO_UPDATE}\" == \"1\" ]; then echo \"Pulling latest changes from GitHub...\"; git pull origin ${GIT_BRANCH:-main}; fi; if [ -f package.json ]; then npm install --production --no-audit --no-fund; fi; export NODE_OPTIONS=\"--max-old-space-size=$(($SERVER_MEMORY - 64)) --use-openssl-ca\"; exec ${CMD_RUN}",
