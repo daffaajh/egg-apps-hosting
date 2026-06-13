@@ -15,7 +15,37 @@ export GOGC=100
 
 echo -e ":/home/container$ ${MODIFIED_STARTUP}"
 
-# Run the Server
+# Run the Server in background
 # We remove 'exec' from here because the startup command might contain logic (if/then).
 # Instead, the 'exec' should be inside the startup command itself, before the final application call.
-eval "${MODIFIED_STARTUP}"
+eval "${MODIFIED_STARTUP}" &
+MAIN_PID=$!
+
+# CPU Monitor Loop for Anti-DDoS / Optimization
+(
+  HIGH_CPU_COUNT=0
+  while true; do
+    sleep 5
+    if ! kill -0 $MAIN_PID 2>/dev/null; then
+       break
+    fi
+    CPU_USAGE=$(ps -p $MAIN_PID -o %cpu= | awk '{print int($1)}')
+    if [ -z "$CPU_USAGE" ]; then continue; fi
+
+    if [ "$CPU_USAGE" -ge 95 ]; then
+      HIGH_CPU_COUNT=$((HIGH_CPU_COUNT + 1))
+    else
+      HIGH_CPU_COUNT=0
+    fi
+
+    # 1 minute continuous at 5 sec intervals = 12 times
+    if [ "$HIGH_CPU_COUNT" -ge 12 ]; then
+      echo "[ANTI-DDOS/OPTIMIZATION] CRITICAL: CPU at 100% continuously for 1 minute! Suspicious activity detected." >&2
+      echo "[$(date)] Suspicious activity: CPU at 100% for 60s. Shutting down server." >> /home/container/suspicious_activity.log
+      kill -9 $MAIN_PID
+      exit 1
+    fi
+  done
+) &
+
+wait $MAIN_PID

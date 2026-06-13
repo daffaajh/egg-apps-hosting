@@ -23,6 +23,7 @@ RUN apt-get update && apt-get upgrade -y \
         libffi-dev \
         libssl-dev \
         libjemalloc2 \
+        procps \
     && useradd -m -d /home/container container \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

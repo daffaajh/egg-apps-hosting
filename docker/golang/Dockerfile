@@ -1,7 +1,7 @@
 ARG GOLANG_VERSION=1.23
 FROM        --platform=$TARGETOS/$TARGETARCH golang:${GOLANG_VERSION}-alpine
 
-RUN         apk add --update --no-cache ca-certificates tzdata git bash \
+RUN         apk add --update --no-cache ca-certificates tzdata git bash procps \
             && adduser -D -h /home/container container
 
 USER        container
