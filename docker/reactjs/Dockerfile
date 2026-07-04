@@ -3,6 +3,7 @@ FROM        --platform=$TARGETOS/$TARGETARCH node:${NODE_VERSION}-alpine
 
 LABEL       author="dapaupau@sigaul.com" maintainer="dapaupau@sigaul.com"
 
+# Install system dependencies, network debug tools, and jemalloc
 RUN         apk add --update --no-cache \
                 ca-certificates \
                 tzdata \
@@ -19,6 +20,7 @@ RUN         apk add --update --no-cache \
 # Pre-install global package managers and process manager
 RUN         npm install -g pnpm yarn pm2 --loglevel=error
 
+# Set environment variables for container and pre-load jemalloc
 ENV         USER=container \
             HOME=/home/container \
             UV_THREADPOOL_SIZE=16 \

@@ -1,0 +1,69 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-07-04T13:12:00+00:00",
+    "name": "ReactJS",
+    "author": "dapaupau@sigaul.com",
+    "description": "Pro-tier ReactJS egg by YuraCloud. Optimized for performance, auto-updates, and support for npm, pnpm, yarn, and bun.",
+    "features": null,
+    "docker_images": {
+        "ReactJS (Node 25)": "ghcr.io/daffaajh/reactjs:25",
+        "ReactJS (Node 24)": "ghcr.io/daffaajh/reactjs:24",
+        "ReactJS (Node 23)": "ghcr.io/daffaajh/reactjs:23",
+        "ReactJS (Node 22)": "ghcr.io/daffaajh/reactjs:22",
+        "ReactJS (Node 21)": "ghcr.io/daffaajh/reactjs:21",
+        "ReactJS (Node 20)": "ghcr.io/daffaajh/reactjs:20",
+        "ReactJS (Node 19)": "ghcr.io/daffaajh/reactjs:19",
+        "ReactJS (Node 18)": "ghcr.io/daffaajh/reactjs:18"
+    },
+    "file_denylist": [],
+    "startup": "print_status() { echo -e \"\\n\\e[1;36m[YuraCloud]\\e[0m \\e[33m$1...\\e[0m\"; }; export PORT=${SERVER_PORT}; export PATH=\"/home/container/.local/bin:/home/container/.bun/bin:$PATH\"; npm config set prefix /home/container/.local --global 2>/dev/null || npm config set prefix /home/container/.local; npm config set cache /home/container/.npm-cache --global 2>/dev/null || npm config set cache /home/container/.npm-cache; pnpm config set store-dir /home/container/.pnpm-store 2>/dev/null; yarn config set cache-folder /home/container/.yarn-cache 2>/dev/null; if [ -f pnpm-lock.yaml ] && ! command -v pnpm &> /dev/null; then print_status \"Menginstal pnpm secara lokal\"; npm install -g pnpm --loglevel=error; fi; if [ -f yarn.lock ] && ! command -v yarn &> /dev/null; then print_status \"Menginstal yarn secara lokal\"; npm install -g yarn --loglevel=error; fi; if [ -f bun.lockb ] && ! command -v bun &> /dev/null; then print_status \"Menginstal bun secara lokal\"; curl -fsSL https://bun.sh/install | bash; fi; if [ -d .git ] && [ \"${AUTO_UPDATE}\" = \"1\" ]; then print_status \"Menarik pembaruan kode dari GitHub\"; git pull; fi; if [ -f package.json ]; then if [ -f pnpm-lock.yaml ]; then print_status \"Menginstal dependensi menggunakan pnpm\"; pnpm install; elif [ -f yarn.lock ]; then print_status \"Menginstal dependensi menggunakan yarn\"; yarn install; elif [ -f bun.lockb ]; then print_status \"Menginstal dependensi menggunakan bun\"; bun install; else print_status \"Menginstal dependensi menggunakan npm\"; npm install; fi; fi; print_status \"Menjalankan aplikasi\"; exec ${CMD_RUN}",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Local:|Network:|Server started on\"\r\n}",
+        "logs": "{}",
+        "stop": "^^C"
+    },
+    "scripts": {
+        "installation": {
+            "container": "alpine:3.18",
+            "entrypoint": "sh",
+            "script": "#!/bin/sh\napk add --no-cache curl git nodejs npm\ncd /mnt/server\n\nif [ ! -f package.json ]; then\n    echo \"Creating default React + Vite project...\"\n    rm -rf * .[!.]*\n    npx --yes create-vite@latest . --template react\nfi\n\n# --- Auto-detect Region ---\nDETECTED_REGION=$(curl -s http://ip-api.com/line?fields=country | head -n 1)\nif [ -z \"$DETECTED_REGION\" ]; then DETECTED_REGION=\"Unknown\"; fi\n\n# --- Branding and Information ---\necho \"\"\necho \"==================================================\"\necho \"                  YuraCloud                       \"\necho \"==================================================\"\necho \"Informasi Server:\"\necho \"UUID      : ${P_SERVER_UUID}\"\necho \"Region    : ${DETECTED_REGION}\"\necho \"Port      : ${SERVER_PORT}\"\necho \"Egg Type  : ReactJS (Vite)\"\necho \"==================================================\"\necho \"    Terima kasih sudah membeli di YuraCloud!      \"\necho \"==================================================\"\necho \"\""
+        }
+    },
+    "variables": [
+        {
+            "name": "Command Run",
+            "description": "The command that will be executed to start your React application (supports npm, pnpm, yarn, bun).",
+            "env_variable": "CMD_RUN",
+            "default_value": "npm run dev -- --host 0.0.0.0 --port ${SERVER_PORT}",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Node Version",
+            "description": "Select the Node.js version to display (Note: Depends on Docker image tag).",
+            "env_variable": "NODE_VERSION",
+            "default_value": "25",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Deploy",
+            "description": "Otomatis melakukan deploy/pull kode terbaru dari GitHub setiap kali server di-restart (seperti konsep Railway).",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        }
+    ]
+}

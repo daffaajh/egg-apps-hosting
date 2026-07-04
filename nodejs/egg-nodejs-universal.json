@@ -5,7 +5,7 @@
         "update_url": null
     },
     "exported_at": "2024-06-02T14:43:56+00:00",
-    "name": "Node.js Custom (Universal Pro)",
+    "name": "Node.js",
     "author": "dapaupau@sigaul.com",
     "description": "Pro-tier Node.js egg by YuraCloud. Optimized for performance, auto-updates, and full customization.",
     "features": null,
@@ -20,7 +20,7 @@
         "Node.js 18": "ghcr.io/daffaajh/nodejs:18"
     },
     "file_denylist": [],
-    "startup": "if [ -d .git ] && [ \"${AUTO_UPDATE}\" == \"1\" ]; then echo \"Pulling latest changes from GitHub...\"; git pull origin ${GIT_BRANCH:-main}; fi; if [ -f package.json ]; then npm install --production --no-audit --no-fund; fi; export NODE_OPTIONS=\"--max-old-space-size=$(($SERVER_MEMORY - 64)) --use-openssl-ca\"; exec ${CMD_RUN}",
+    "startup": "print_status() { echo -e \"\\n\\e[1;36m[YuraCloud]\\e[0m \\e[33m$1...\\e[0m\"; }; export PORT=${SERVER_PORT}; export PATH=\"/home/container/.local/bin:$PATH\"; npm config set prefix /home/container/.local --global 2>/dev/null || npm config set prefix /home/container/.local; npm config set cache /home/container/.npm-cache --global 2>/dev/null || npm config set cache /home/container/.npm-cache; if [ -d .git ] && [ \"${AUTO_UPDATE}\" == \"1\" ]; then print_status \"Menarik pembaruan kode dari GitHub\"; git pull; fi; if [ -f package.json ]; then print_status \"Menginstal dependensi produksi\"; npm install --production --no-audit --no-fund; fi; export NODE_OPTIONS=\"--max-old-space-size=$(($SERVER_MEMORY - 64)) --use-openssl-ca\"; print_status \"Menjalankan aplikasi\"; exec ${CMD_RUN}",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"Server started on\"\r\n}",
@@ -31,7 +31,7 @@
         "installation": {
             "container": "alpine:3.18",
             "entrypoint": "sh",
-            "script": "#!/bin/sh\napk add --no-cache curl git nodejs npm\ncd /mnt/server\n\n# --- Clone from GitHub if repository URL is provided ---\nif [ -n \"${GIT_REPO_URL}\" ] && [ ! -d .git ]; then\n    echo \"Cloning repository from ${GIT_REPO_URL}...\"\n    rm -rf /mnt/server/*\n    rm -rf /mnt/server/.[!.]*\n    git clone -b ${GIT_BRANCH:-main} ${GIT_REPO_URL} /tmp/repo\n    mv /tmp/repo/.git /mnt/server/\n    mv /tmp/repo/* /mnt/server/ 2>/dev/null || true\n    mv /tmp/repo/.[!.]* /mnt/server/ 2>/dev/null || true\n    rm -rf /tmp/repo\n    echo \"Repository cloned successfully!\"\nelif [ -n \"${GIT_REPO_URL}\" ] && [ -d .git ]; then\n    echo \"Git repository already exists, pulling latest changes...\"\n    git fetch origin\n    git reset --hard origin/${GIT_BRANCH:-main}\n    echo \"Repository updated successfully!\"\nfi\n\n# --- Create default files if needed ---\nif [ ! -f package.json ]; then\ncat << 'EOF' > package.json\n{\n  \"name\": \"yuracloud-app\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Node.js application on YuraCloud\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"start\": \"node index.js\"\n  },\n  \"author\": \"YuraCloud\",\n  \"license\": \"ISC\"\n}\nEOF\nfi\n\nif [ -f package.json ]; then\n    npm install --production --no-audit --no-fund --loglevel=error\n    npm cache clean --force\nfi\n\nif [ ! -f index.js ]; then\ncat << 'EOF' > index.js\nconst http = require('http');\n\nconst port = process.env.PORT || process.env.SERVER_PORT || 8080;\n\nconst server = http.createServer((req, res) => {\n  res.statusCode = 200;\n  res.setHeader('Content-Type', 'text/plain');\n  res.end('Hello from YuraCloud Node.js!\\\\n');\n});\n\nserver.listen(port, () => {\n  console.log(`Server started on :${port}`);\n});\nEOF\nfi\n\n# --- Auto-detect Region ---\nDETECTED_REGION=$(curl -s http://ip-api.com/line?fields=country | head -n 1)\nif [ -z \"$DETECTED_REGION\" ]; then DETECTED_REGION=\"Unknown\"; fi\n\n# --- Branding and Information ---\necho \"\"\necho \"==================================================\"\necho \"                  YuraCloud                       \"\necho \"==================================================\"\necho \"Informasi Server:\"\necho \"UUID      : ${P_SERVER_UUID}\"\necho \"Region    : ${DETECTED_REGION}\"\necho \"Port      : ${SERVER_PORT}\"\necho \"Egg Type  : Node.js\"\nif [ -n \"${GIT_REPO_URL}\" ]; then\necho \"GitHub    : ${GIT_REPO_URL}\"\necho \"Branch    : ${GIT_BRANCH:-main}\"\nfi\necho \"==================================================\"\necho \"    Terima kasih sudah membeli di YuraCloud!      \"\necho \"==================================================\"\necho \"\""
+            "script": "#!/bin/sh\napk add --no-cache curl git nodejs npm\ncd /mnt/server\n\n# --- Create default files if needed ---\nif [ ! -f package.json ]; then\ncat << 'EOF' > package.json\n{\n  \"name\": \"yuracloud-app\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Node.js application on YuraCloud\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"start\": \"node index.js\"\n  },\n  \"author\": \"YuraCloud\",\n  \"license\": \"ISC\"\n}\nEOF\nfi\n\nif [ -f package.json ]; then\n    npm install --production --no-audit --no-fund --loglevel=error\n    npm cache clean --force\nfi\n\nif [ ! -f index.js ]; then\ncat << 'EOF' > index.js\nconst http = require('http');\n\nconst port = process.env.PORT || process.env.SERVER_PORT || 8080;\n\nconst server = http.createServer((req, res) => {\n  res.statusCode = 200;\n  res.setHeader('Content-Type', 'text/plain');\n  res.end('Hello from YuraCloud Node.js!\\\\n');\n});\n\nserver.listen(port, () => {\n  console.log(`Server started on :${port}`);\n});\nEOF\nfi\n\n# --- Auto-detect Region ---\nDETECTED_REGION=$(curl -s http://ip-api.com/line?fields=country | head -n 1)\nif [ -z \"$DETECTED_REGION\" ]; then DETECTED_REGION=\"Unknown\"; fi\n\n# --- Branding and Information ---\necho \"\"\necho \"==================================================\"\necho \"                  YuraCloud                       \"\necho \"==================================================\"\necho \"Informasi Server:\"\necho \"UUID      : ${P_SERVER_UUID}\"\necho \"Region    : ${DETECTED_REGION}\"\necho \"Port      : ${SERVER_PORT}\"\necho \"Egg Type  : Node.js\"\necho \"==================================================\"\necho \"    Terima kasih sudah membeli di YuraCloud!      \"\necho \"==================================================\"\necho \"\""
         }
     },
     "variables": [
@@ -56,33 +56,13 @@
             "field_type": "text"
         },
         {
-            "name": "Auto Update",
-            "description": "Pull latest changes from git on startup if .git exists.",
+            "name": "Auto Deploy",
+            "description": "Otomatis melakukan deploy/pull kode terbaru dari GitHub setiap kali server di-restart (seperti konsep Railway).",
             "env_variable": "AUTO_UPDATE",
             "default_value": "0",
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|boolean",
-            "field_type": "text"
-        },
-        {
-            "name": "GitHub Repository URL",
-            "description": "GitHub repository URL to clone (e.g., https://github.com/username/repo.git). Leave empty to skip auto-deployment.",
-            "env_variable": "GIT_REPO_URL",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string",
-            "field_type": "text"
-        },
-        {
-            "name": "GitHub Branch",
-            "description": "Branch to clone/pull from GitHub repository.",
-            "env_variable": "GIT_BRANCH",
-            "default_value": "main",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|string",
             "field_type": "text"
         }
     ]

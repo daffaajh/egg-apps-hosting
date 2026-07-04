@@ -3,9 +3,16 @@
 # Switch to the container's working directory
 cd /home/container
 
+# Detect and enable jemalloc for better memory management
+if [ -f /usr/lib/x86_64-linux-gnu/libjemalloc.so.2 ]; then
+    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
+elif [ -f /usr/lib/aarch64-linux-gnu/libjemalloc.so.2 ]; then
+    export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libjemalloc.so.2
+fi
+
 # FORCE FIX: Jika startup command bawaan panel salah (masih Node.js)
 if [[ "${STARTUP}" == *"npm"* ]] || [[ "${STARTUP}" == *"node"* ]]; then
-    STARTUP="if [ ! -z \"\${PRE_STARTUP_COMMAND}\" ]; then eval \${PRE_STARTUP_COMMAND}; fi; if [ -d .git ] && [ \"\${AUTO_UPDATE}\" = \"1\" ]; then git pull; fi; if [ -f requirements.txt ]; then pip install -q -r requirements.txt; fi; exec python \${PY_FILE}"
+    STARTUP="print_status() { echo -e \"\\n\\e[1;36m[YuraCloud]\\e[0m \\e[33m\$1...\\e[0m\"; }; if [ ! -z \"\${PRE_STARTUP_COMMAND}\" ]; then print_status \"Menjalankan pre-startup command\"; eval \${PRE_STARTUP_COMMAND}; fi; if [ -d .git ] && [ \"\${AUTO_UPDATE}\" = \"1\" ]; then print_status \"Menarik pembaruan kode dari GitHub\"; git pull; fi; if [ -f requirements.txt ]; then print_status \"Menginstal dependensi Python\"; pip install --user -q -r requirements.txt; fi; print_status \"Menjalankan aplikasi\"; exec python \${PY_FILE}"
 fi
 
 # Replace Startup Variables

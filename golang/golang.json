@@ -5,7 +5,7 @@
         "update_url": null
     },
     "exported_at": "2024-06-02T14:43:56+00:00",
-    "name": "Golang Custom (Universal Pro)",
+    "name": "Golang",
     "author": "dapaupau@sigaul.com",
     "description": "Pro-tier Golang egg by YuraCloud. Optimized for performance, auto-updates, security scanning, and full customization.",
     "features": null,
@@ -18,7 +18,7 @@
         "Golang 1.18": "ghcr.io/daffaajh/golang:1.18"
     },
     "file_denylist": [],
-    "startup": "if [ -d .git ] && [ \"${AUTO_UPDATE}\" == \"1\" ]; then git pull; fi; if [ -f go.mod ]; then go mod tidy; fi; exec ${CMD_RUN}",
+    "startup": "print_status() { echo -e \"\\n\\e[1;36m[YuraCloud]\\e[0m \\e[33m$1...\\e[0m\"; }; if [ -d .git ] && [ \"${AUTO_UPDATE}\" == \"1\" ]; then print_status \"Menarik pembaruan kode dari GitHub\"; git pull; fi; if [ -f go.mod ]; then print_status \"Menjalankan go mod tidy\"; go mod tidy; fi; print_status \"Menjalankan aplikasi\"; exec ${CMD_RUN}",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"Server started on\"\r\n}",
@@ -54,8 +54,8 @@
             "field_type": "text"
         },
         {
-            "name": "Auto Update",
-            "description": "Pull latest changes from git on startup if .git exists.",
+            "name": "Auto Deploy",
+            "description": "Otomatis melakukan deploy/pull kode terbaru dari GitHub setiap kali server di-restart (seperti konsep Railway).",
             "env_variable": "AUTO_UPDATE",
             "default_value": "0",
             "user_viewable": true,

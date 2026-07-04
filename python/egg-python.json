@@ -17,7 +17,7 @@
         "Python 3.8": "ghcr.io/daffaajh/python:3.8"
     },
     "file_denylist": [],
-    "startup": "if [ ! -z \"${PRE_STARTUP_COMMAND}\" ]; then eval ${PRE_STARTUP_COMMAND}; fi; if [ -d .git ] && [ \"${AUTO_UPDATE}\" = \"1\" ]; then git pull; fi; if [ -f requirements.txt ]; then pip install -q -r requirements.txt; fi; exec python ${PY_FILE}",
+    "startup": "print_status() { echo -e \"\\n\\e[1;36m[YuraCloud]\\e[0m \\e[33m$1...\\e[0m\"; }; if [ ! -z \"${PRE_STARTUP_COMMAND}\" ]; then print_status \"Menjalankan pre-startup command\"; eval ${PRE_STARTUP_COMMAND}; fi; if [ -d .git ] && [ \"${AUTO_UPDATE}\" = \"1\" ]; then print_status \"Menarik pembaruan kode dari GitHub\"; git pull; fi; if [ -f requirements.txt ]; then print_status \"Menginstal dependensi Python\"; pip install --user -q -r requirements.txt; fi; print_status \"Menjalankan aplikasi\"; exec python ${PY_FILE}",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"STARTING|Running|ready|Server started\"\r\n}",
@@ -28,7 +28,7 @@
         "installation": {
             "container": "python:3.11-slim",
             "entrypoint": "bash",
-            "script": "#!/bin/bash\napt-get update\napt-get install -y git curl ca-certificates\n\ncd /mnt/server\n\nif [ ! -z \"${GITHUB_PACKAGE}\" ]; then\n    if [ -z \"${GITHUB_PERSONAL_TOKEN}\" ]; then\n        git clone ${GITHUB_PACKAGE} .\n    else\n        git clone https://${GITHUB_USER}:${GITHUB_PERSONAL_TOKEN}@github.com/${GITHUB_PACKAGE} .\n    fi\nfi\n\nif [ ! -f main.py ]; then\ncat << 'EOF' > main.py\nprint(\"Hello from YuraCloud Python!\")\nimport time\nwhile True:\n    print(\"Server is running...\")\n    time.sleep(60)\nEOF\nfi\n\n# --- Auto-detect Region ---\nDETECTED_REGION=$(curl -s http://ip-api.com/line?fields=country | head -n 1)\nif [ -z \"$DETECTED_REGION\" ]; then DETECTED_REGION=\"Unknown\"; fi\n\n# --- Branding and Information ---\necho \"\"\necho \"==================================================\"\necho \"                  YuraCloud                       \"\necho \"==================================================\"\necho \"Informasi Server:\"\necho \"UUID      : ${P_SERVER_UUID}\"\necho \"Region    : ${DETECTED_REGION}\"\necho \"Port      : ${SERVER_PORT}\"\necho \"Egg Type  : Python\"\necho \"==================================================\"\necho \"    Terima kasih sudah membeli di YuraCloud!      \"\necho \"==================================================\"\necho \"\""
+            "script": "#!/bin/bash\napt-get update\napt-get install -y git curl ca-certificates\n\ncd /mnt/server\n\nif [ ! -f main.py ]; then\ncat << 'EOF' > main.py\nprint(\"Hello from YuraCloud Python!\")\nimport time\nwhile True:\n    print(\"Server is running...\")\n    time.sleep(60)\nEOF\nfi\n\n# --- Auto-detect Region ---\nDETECTED_REGION=$(curl -s http://ip-api.com/line?fields=country | head -n 1)\nif [ -z \"$DETECTED_REGION\" ]; then DETECTED_REGION=\"Unknown\"; fi\n\n# --- Branding and Information ---\necho \"\"\necho \"==================================================\"\necho \"                  YuraCloud                       \"\necho \"==================================================\"\necho \"Informasi Server:\"\necho \"UUID      : ${P_SERVER_UUID}\"\necho \"Region    : ${DETECTED_REGION}\"\necho \"Port      : ${SERVER_PORT}\"\necho \"Egg Type  : Python\"\necho \"==================================================\"\necho \"    Terima kasih sudah membeli di YuraCloud!      \"\necho \"==================================================\"\necho \"\""
         }
     },
     "variables": [
@@ -43,16 +43,6 @@
             "field_type": "text"
         },
         {
-            "name": "GitHub Repository",
-            "description": "Optional: GitHub repository to clone (e.g., username/repo).",
-            "env_variable": "GITHUB_PACKAGE",
-            "default_value": "",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "nullable|string",
-            "field_type": "text"
-        },
-        {
             "name": "Pre-Startup Command",
             "description": "Custom commands to run BEFORE the main script (e.g., pip install psutil).",
             "env_variable": "PRE_STARTUP_COMMAND",
@@ -63,8 +53,8 @@
             "field_type": "text"
         },
         {
-            "name": "Auto Update",
-            "description": "Pull latest changes from git on startup if .git exists.",
+            "name": "Auto Deploy",
+            "description": "Otomatis melakukan deploy/pull kode terbaru dari GitHub setiap kali server di-restart (seperti konsep Railway).",
             "env_variable": "AUTO_UPDATE",
             "default_value": "0",
             "user_viewable": true,

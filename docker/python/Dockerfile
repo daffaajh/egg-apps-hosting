@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.11
-FROM python:${PYTHON_VERSION}-slim
+FROM --platform=$TARGETOS/$TARGETARCH python:${PYTHON_VERSION}-slim
 
 LABEL author="YuraCloud" maintainer="dapaupau@sigaul.com"
 
