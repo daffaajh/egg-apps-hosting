@@ -18,7 +18,10 @@ RUN         apk add --update --no-cache \
             && adduser -D -h /home/container container
 
 # Pre-install global package managers and process manager
-RUN         npm install -g pnpm pm2 --loglevel=error
+RUN         npm config set fetch-retries 5 \
+            && npm config set fetch-retry-mintimeout 20000 \
+            && npm config set fetch-retry-maxtimeout 120000 \
+            && npm install -g pnpm pm2 --loglevel=error
 
 # Set environment variables for container and pre-load jemalloc
 ENV         USER=container \
