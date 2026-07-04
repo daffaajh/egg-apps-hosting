@@ -17,7 +17,7 @@ RUN         apk add --update --no-cache \
             && adduser -D -h /home/container container
 
 # Pre-install global package managers and process manager
-RUN         npm install -g pnpm yarn pm2 --loglevel=error
+RUN         npm install -g pnpm pm2 --loglevel=error
 
 ENV         USER=container \
             HOME=/home/container \
