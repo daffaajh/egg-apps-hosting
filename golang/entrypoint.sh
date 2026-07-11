@@ -1,6 +1,20 @@
 #!/bin/bash
 cd /home/container
 
+# --- System Performance Tuning (Swap/Cache) ---
+if [ -w /proc/sys/vm/swappiness ] 2>/dev/null; then
+    echo 10 > /proc/sys/vm/swappiness
+fi
+
+if [ -w /proc/sys/vm/vfs_cache_pressure ] 2>/dev/null; then
+    echo 50 > /proc/sys/vm/vfs_cache_pressure
+fi
+
+if [ -w /sys/kernel/mm/transparent_hugepage/defrag ] 2>/dev/null; then
+    echo "defer+madvise" > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+
+
 # Internal environment variable for the startup command
 MODIFIED_STARTUP=$(echo -e ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
 

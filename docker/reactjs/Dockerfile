@@ -15,6 +15,12 @@ RUN         apk add --update --no-cache \
                 procps \
                 jemalloc \
                 bind-tools \
+                zip \
+                unzip \
+                tar \
+                wget \
+                openssl \
+                jq \
             && adduser -D -h /home/container container
 
 # Pre-install global package managers and process manager

@@ -24,6 +24,13 @@ RUN apt-get update && apt-get upgrade -y \
         libssl-dev \
         libjemalloc2 \
         procps \
+        zip \
+        unzip \
+        tar \
+        wget \
+        openssl \
+        jq \
+        dnsutils \
     && useradd -m -d /home/container container \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
